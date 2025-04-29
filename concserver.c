@@ -49,16 +49,24 @@ int main(int argc, char **argv)
         exit(0);
     }
 
-    while(1)
+   while(1)
     {
         clientlen=sizeof(struct sockaddr_storage);
-        connfd=accept(listenfd, (struct sockaddr*) clientaddr, &clientlen);
+        connfd=accept(listenfd, (struct sockaddr*)clientaddr, &clientlen);
         if(connfd<0)
-            continue;   //connect faild
-        send(connfd,msg,strlen(msg),0);
-        sleep(5); 
+            continue;   
+        if (fork() == 0)  {
+            close(listenfd);
+            send(connfd,msg,strlen(msg),0);
+            sleep(10);
+            close(connfd);
+            exit(0); 
+        }
+      
         close(connfd);
     }
 
     return 0;
 }
+
+ 
